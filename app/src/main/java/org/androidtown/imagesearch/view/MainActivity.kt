@@ -20,6 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val REST_API_KEY = "REST_API_KEY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             .build()
             .create(APIService::class.java)
 
-        val repos: Single<Repo> = service.searchImage("KakaoAK f81f0fdcbef3e47beca18a2ad6e8eeeb", "설현", "accuracy", 1, 80)
+        val repos: Single<Repo> = service.searchImage("KakaoAK $REST_API_KEY", "설현", "accuracy", 1, 80)
 
         repos.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
