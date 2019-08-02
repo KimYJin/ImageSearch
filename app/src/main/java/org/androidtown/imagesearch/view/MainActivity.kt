@@ -4,23 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.databinding.DataBindingUtil
-import io.reactivex.Scheduler
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_main.*
 import org.androidtown.imagesearch.R
 import org.androidtown.imagesearch.databinding.ActivityMainBinding
-import org.androidtown.imagesearch.model.APIService
-import org.androidtown.imagesearch.model.Repo
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import org.androidtown.imagesearch.viewmodel.MainViewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(){
 
     private lateinit var binding: ActivityMainBinding
-    private val REST_API_KEY = "REST_API_KEY"
+    private val viewModel = MainViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,24 +25,12 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
         setSupportActionBar(main_toolbar)
 
-        val service: APIService = Retrofit.Builder()
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://dapi.kakao.com")
-            .build()
-            .create(APIService::class.java)
+        viewModel.imageSearchResponseLiveData.observe(this, Observer {
+            Log.d("View:MainActivity", it.documents.toString())
+        })
 
-        val repos: Single<Repo> = service.searchImage("KakaoAK $REST_API_KEY", "설현", "accuracy", 1, 80)
-
-        repos.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                //handle success
-                Log.d("Success message", it.documents.toString())
-            }, {
-                //handle fail
-                Log.d("Fail message",it.message)
-            })
-
+        binding.searchBtn.setOnClickListener{
+            viewModel.getImageSearch(binding.searchEdittxt.text.toString(),"accuracy")
+        }
     }
 }

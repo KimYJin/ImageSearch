@@ -10,5 +10,5 @@ interface APIService {
 
     @GET("/v2/search/image")
     fun searchImage(@Header("Authorization") auth:String, @Query("query") query:String, @Query("sort") sort:String, @Query("page") page:Int, @Query("size") size:Int
-    ): Single<Repo>
+    ): Single<ImageSearchResponse>
 }
