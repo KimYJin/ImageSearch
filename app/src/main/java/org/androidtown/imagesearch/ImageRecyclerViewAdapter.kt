@@ -7,10 +7,10 @@ import org.androidtown.imagesearch.model.Document
 class ImageRecyclerViewAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var documentDataList = ArrayList<Document>()
-    private lateinit var callOnClick:CallOnClick
+    private lateinit var callOnClickImage:CallOnClickImage
 
-    constructor(callOnClick: CallOnClick):this(){
-        this.callOnClick = callOnClick
+    constructor(callOnClickImage: CallOnClickImage):this(){
+        this.callOnClickImage = callOnClickImage
     }
 
     fun setItems(documentData: ArrayList<Document>) {
@@ -18,12 +18,10 @@ class ImageRecyclerViewAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged()
     }
 
-    //factory 패턴 이용해 객체 생성해서 넘김
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
-            = ImageViewHolder.newInstance(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = ImageViewHolder(parent)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as? ImageViewHolder)?.onBind(documentDataList,position, callOnClick)
+        (holder as? ImageViewHolder)?.onBind(documentDataList, position, callOnClickImage)
     }
 
     override fun getItemCount() = documentDataList.size

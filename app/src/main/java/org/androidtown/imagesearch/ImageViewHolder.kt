@@ -1,29 +1,25 @@
 package org.androidtown.imagesearch
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import org.androidtown.imagesearch.databinding.ItemMainImageBinding
+import kotlinx.android.synthetic.main.item_main_image.view.*
 import org.androidtown.imagesearch.model.Document
 
-class ImageViewHolder(private val binding: ItemMainImageBinding, private val context: Context) :
-    RecyclerView.ViewHolder(binding.root) {
+class ImageViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
 
-    companion object {
-        fun newInstance(parent: ViewGroup): ImageViewHolder {
-            return ImageViewHolder(
-                ItemMainImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                , parent.context)
-        }
-    }
+    LayoutInflater.from(parent.context).inflate(R.layout.item_main_image, parent, false)
+) {
+    fun onBind(documentList: ArrayList<Document>, position: Int, callOnClickImage: CallOnClickImage) {
+        itemView.run {
 
-    fun onBind(documentList:ArrayList<Document>, position:Int, callOnClick: CallOnClick) {
-        binding.itemMainImageView.run{
-            Glide.with(context).load(documentList[position].image_url).into(this)
+            //뷰홀더 아이템 뷰에 이미지 load
+            Glide.with(context).load(documentList[position].image_url).into(item_main_image_view)
+
+            //해당 아이템뷰 클릭 시, onClickImage 에 position 넘겨줌 (상세보기 뷰 구현을 위해)
             setOnClickListener {
-                callOnClick.onImageClick(documentList,position)
+                callOnClickImage.onClickImage(position)
             }
         }
     }
