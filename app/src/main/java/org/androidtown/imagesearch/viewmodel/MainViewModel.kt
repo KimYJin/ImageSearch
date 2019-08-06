@@ -8,15 +8,17 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.androidtown.imagesearch.model.APIService
+import org.androidtown.imagesearch.model.Document
 import org.androidtown.imagesearch.model.ImageSearchModel
 import org.androidtown.imagesearch.model.ImageSearchResponse
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MainViewModel(): ViewModel() {
+class MainViewModel: ViewModel() {
 
-    val imageSearchResponseLiveData = MutableLiveData<ImageSearchResponse>()
+    val documentLiveData = MutableLiveData<ArrayList<Document>>()
+
     private val compositeDisposable = CompositeDisposable()
 
     private val service: APIService = Retrofit.Builder()
@@ -29,6 +31,7 @@ class MainViewModel(): ViewModel() {
     private val model:ImageSearchModel=ImageSearchModel(service)
 
     // RxJava - Observing
+    // get ImageSearchResult from model with query -> post value to documentLiveData
     fun getImageSearch(query: String, sort:String) {
         addDisposable(model.getData(query, sort)
             .subscribeOn(Schedulers.io())
@@ -37,7 +40,8 @@ class MainViewModel(): ViewModel() {
                 it.run {
                     if (documents.size > 0) {
                         Log.d("MainViewModel", "documents : $documents")
-                        imageSearchResponseLiveData.postValue(this)
+                        //imageSearchResponseLiveData.postValue(this)
+                        documentLiveData.postValue(documents)
                     }
                     Log.d("MainViewModel", "meta : $meta")
                 }

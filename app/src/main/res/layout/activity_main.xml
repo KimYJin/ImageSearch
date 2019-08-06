@@ -2,65 +2,125 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MainActivity">
 
+        <!-- 툴바 -->
         <androidx.appcompat.widget.Toolbar
-                android:layout_width="match_parent"
+                android:id="@+id/main_toolbar"
+                android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/colorPrimary"
-                android:elevation="3dp"
-                android:id="@+id/main_toolbar"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:elevation="3dp"/>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        android:text="@string/my_name"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="20dp"
-                        android:textStyle="bold"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.appcompat.widget.Toolbar>
-
-        <EditText android:layout_width="0dp"
-                  android:layout_height="40dp"
-                  android:id="@+id/search_edittxt"
-                  app:layout_constraintTop_toBottomOf="@+id/main_toolbar"
-                  app:layout_constraintLeft_toLeftOf="parent"
-                  app:layout_constraintRight_toLeftOf="@+id/search_btn"
-                  android:layout_marginLeft="10dp"
-                  android:layout_marginRight="10dp"
-                  android:layout_marginTop="15dp"
-                  android:textColor="@color/colorBlack"/>
-        <ImageButton
-                android:id="@+id/search_btn"
+        <!-- 지원자 이름 -->
+        <TextView
+                android:id="@+id/apply_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintLeft_toRightOf="@+id/search_edittxt"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_toolbar"
-                android:background="@color/colorWhite"
+                app:layout_constraintLeft_toLeftOf="@id/main_toolbar"
+                app:layout_constraintTop_toTopOf="@id/main_toolbar"
+                app:layout_constraintBottom_toBottomOf="@id/main_toolbar"
+                android:text="@string/my_name"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+        <!-- 입력 창 -->
+        <EditText
+                android:id="@+id/search_edittxt"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                app:layout_constraintTop_toBottomOf="@id/main_toolbar"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/search_btn"
                 android:layout_marginTop="15dp"
+                android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/button_img"/>
+                android:hint="검색어를 입력하세요"
+                android:textColor="@color/colorBlack"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_edittxt"
+        <ImageButton
+                android:id="@+id/search_btn"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                app:layout_constraintTop_toTopOf="@id/search_edittxt"
+                app:layout_constraintBottom_toBottomOf="@id/search_edittxt"
+                app:layout_constraintLeft_toRightOf="@id/search_edittxt"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/search_btn_img"/>
+
+        <!--최신 순 정렬 버튼-->
+        <TextView
+                android:id="@+id/sort_recency_text_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="최신"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/search_edittxt"
+                android:layout_marginRight="30dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/colorDarkGray"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/sort_recency_image_btn"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                app:layout_constraintRight_toLeftOf="@id/sort_recency_text_btn"
+                app:layout_constraintTop_toTopOf="@id/sort_recency_text_btn"
+                app:layout_constraintBottom_toBottomOf="@id/sort_recency_text_btn"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/red_btn"/>
+
+        <!--정확도 순 정렬 버튼-->
+        <TextView
+                android:id="@+id/sort_accuracy_text_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="정확도"
+                app:layout_constraintRight_toLeftOf="@id/sort_recency_image_btn"
+                app:layout_constraintTop_toTopOf="@id/sort_recency_image_btn"
+                app:layout_constraintBottom_toBottomOf="@id/sort_recency_image_btn"
                 android:layout_margin="10dp"
-        >
+                android:textColor="@color/colorDarkGray"/>
 
-        </androidx.recyclerview.widget.RecyclerView>
+        <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/sort_accuracy_image_btn"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/red_btn"
+                app:layout_constraintRight_toLeftOf="@id/sort_accuracy_text_btn"
+                app:layout_constraintTop_toTopOf="@id/sort_accuracy_text_btn"
+                app:layout_constraintBottom_toBottomOf="@id/sort_accuracy_text_btn"
+                android:layout_marginRight="5dp"/>
+
+        <!-- 이미지 검색 결과 창 -->
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/image_recyclerview"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/sort_accuracy_text_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_margin="10dp"/>
+
+        <!-- 이미지 상세 결과 창 -->
+        <FrameLayout
+                android:id="@+id/detail_image_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/sort_accuracy_text_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_margin="10dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
