@@ -23,6 +23,7 @@
 ### 제작 기간 
  - 19.08.01 ~ 19.08.07
  <br>
+ 
 - 개발 환경
 
   |  Name  |  Version  |
@@ -31,7 +32,9 @@
     Gradle  |  5.11  
     kotlin  |  1.3.41  
     Compile Sdk | 28   
+    
 <br>
+
 - 사용 라이브러리
 
 	|Library|Version|
