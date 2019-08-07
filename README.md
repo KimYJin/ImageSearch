@@ -1,14 +1,12 @@
 # ImageSearch
 - 카카오 이미지 API 를 이용한 이미지 검색 앱
-
-
-
+<br><br>
 ### 데모 영상
 
 <div>
 <img src="https://user-images.githubusercontent.com/23073504/62593986-d45ea380-b913-11e9-8e8e-065343916ba2.gif">
 </div>
-
+<br><br>
 ### 설명
  (1) MVVM 패턴, RxJava + Retrofit를 이용한 네트워킹 및 옵저빙<br>
  (2) Live Data를 이용한 Data Binding<br>
@@ -21,10 +19,10 @@
  (8) 검색어를 입력하지 않고 검색버튼을 누르면, 검색어를 입력하도록 토스트 메시지를 띄움<br>
  (9) 검색어에 대한 검색 결과가 없는 경우, 검색결과가 없다는 토스트 메시지를 띄움<br>
  
- 
+ <br><br>
 ### 제작 기간 
  - 19.08.01 ~ 19.08.07
- 
+ <br>
 - 개발 환경
 
   |  Name  |  Version  |
@@ -33,7 +31,7 @@
     Gradle  |  5.11  
     kotlin  |  1.3.41  
     Compile Sdk | 28   
-
+<br>
 - 사용 라이브러리
 
 	|Library|Version|
