@@ -40,6 +40,7 @@ class ImageViewPagerAdapter : PagerAdapter() {
         view.detailImageView.run {
             Glide.with(context).load(documentDataList[position].image_url).into(this)
 
+            //이미지를 클릭하면, 웹 브라우저로 해당 이미지의 문서 URL 을 연다.
             setOnClickListener {
                 ContextCompat.startActivity(
                     context,

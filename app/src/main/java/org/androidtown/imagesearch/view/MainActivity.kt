@@ -230,7 +230,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
     /**
      * 특정 이미지 클릭 시, 상세보기 뷰에 해당 이미지를 load
      *
-     * @param position ImageViewHolder
+     * @param position 클릭한 아이템뷰의 position 을 ImageViewHolder 로 부터 넘겨 받음
      */
     override fun onClickImage(position: Int) {
         //클릭한 이미지의 정보 초기화
