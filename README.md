@@ -7,9 +7,10 @@
 <img src="https://user-images.githubusercontent.com/23073504/62593986-d45ea380-b913-11e9-8e8e-065343916ba2.gif">
 </div>
 <br><br>
+
 ### 설명
 
-<br>(1) MVVM 패턴, RxJava + Retrofit를 이용한 네트워킹 및 옵저빙<br>
+(1) MVVM 패턴, RxJava + Retrofit를 이용한 네트워킹 및 옵저빙<br>
  (2) Live Data를 이용한 Data Binding<br>
  (3) RecyclerView, GridLayoutManager, Glide 를 이용해 검색 결과 화면 구현<br>
  (4) 정확도 순, 최신 순 으로 검색이 가능하도록 구현<br>
