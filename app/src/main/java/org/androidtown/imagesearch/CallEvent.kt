@@ -1,5 +1,6 @@
 package org.androidtown.imagesearch
 
-interface CallOnClickImage {
+interface CallEvent {
    fun onClickImage(position:Int)
+   fun onFinishScroll(position: Int)
 }

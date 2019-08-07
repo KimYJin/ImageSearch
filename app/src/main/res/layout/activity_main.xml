@@ -6,7 +6,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorWhite"
             tools:context=".MainActivity">
 
         <!-- 툴바 -->
@@ -36,6 +35,9 @@
         <!-- 입력 창 -->
         <EditText
                 android:id="@+id/search_edittxt"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 app:layout_constraintTop_toBottomOf="@id/main_toolbar"
@@ -47,6 +49,7 @@
                 android:hint="검색어를 입력하세요"
                 android:textColor="@color/colorBlack"/>
 
+        <!-- 검색 버튼 -->
         <ImageButton
                 android:id="@+id/search_btn"
                 android:layout_width="25dp"
@@ -58,7 +61,7 @@
                 android:layout_marginRight="15dp"
                 android:background="@drawable/search_btn_img"/>
 
-        <!--최신 순 정렬 버튼-->
+        <!-- 최신 순 정렬 버튼 -->
         <TextView
                 android:id="@+id/sort_recency_text_btn"
                 android:layout_width="wrap_content"
@@ -68,8 +71,9 @@
                 app:layout_constraintTop_toBottomOf="@id/search_edittxt"
                 android:layout_marginRight="30dp"
                 android:layout_marginTop="10dp"
-                android:textColor="@color/colorDarkGray"/>
+                android:textColor="@drawable/text_color_change"/>
 
+        <!-- 최신 순 정렬 체크용 이미지-->
         <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/sort_recency_image_btn"
                 android:layout_width="10dp"
@@ -77,7 +81,8 @@
                 app:layout_constraintRight_toLeftOf="@id/sort_recency_text_btn"
                 app:layout_constraintTop_toTopOf="@id/sort_recency_text_btn"
                 app:layout_constraintBottom_toBottomOf="@id/sort_recency_text_btn"
-                android:background="@drawable/sort_check_img"/>
+                android:background="@drawable/sort_check_img"
+                android:visibility="invisible"/>
 
         <!--정확도 순 정렬 버튼-->
         <TextView
@@ -89,8 +94,9 @@
                 app:layout_constraintTop_toTopOf="@id/sort_recency_image_btn"
                 app:layout_constraintBottom_toBottomOf="@id/sort_recency_image_btn"
                 android:layout_margin="10dp"
-                android:textColor="@color/colorDarkGray"/>
+                android:textColor="@drawable/text_color_change"/>
 
+        <!-- 정확도 순 정렬 체크용 이미지-->
         <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/sort_accuracy_image_btn"
                 android:layout_width="10dp"
@@ -98,10 +104,9 @@
                 android:background="@drawable/sort_check_img"
                 app:layout_constraintRight_toLeftOf="@id/sort_accuracy_text_btn"
                 app:layout_constraintTop_toTopOf="@id/sort_accuracy_text_btn"
-                app:layout_constraintBottom_toBottomOf="@id/sort_accuracy_text_btn"
-              />
+                app:layout_constraintBottom_toBottomOf="@id/sort_accuracy_text_btn"/>
 
-        <!-- 이미지 검색 결과 창 -->
+        <!-- 이미지 검색결과를 위한 리사이클러 뷰 -->
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/image_recyclerview"
                 android:layout_width="0dp"
@@ -112,7 +117,18 @@
                 app:layout_constraintRight_toRightOf="parent"
                 android:layout_margin="10dp"/>
 
-        <!-- 이미지 상세 결과 창 -->
+        <!-- 스크롤 최상단으로 바로가기 버튼 -->
+        <Button
+                android:id="@+id/top_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:layout_constraintBottom_toBottomOf="@+id/image_recyclerview"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:background="@drawable/top_button_img"
+                android:visibility="invisible"/>
+
+        <!-- 이미지 상세보기 뷰 -->
         <FrameLayout
                 android:id="@+id/detail_image_container"
                 android:layout_width="0dp"
@@ -121,7 +137,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                android:layout_marginTop="5dp"
-                />
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

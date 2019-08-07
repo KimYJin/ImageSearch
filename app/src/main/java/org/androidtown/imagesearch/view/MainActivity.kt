@@ -4,34 +4,30 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import org.androidtown.imagesearch.ImageRecyclerViewAdapter
 import org.androidtown.imagesearch.databinding.ActivityMainBinding
 import org.androidtown.imagesearch.viewmodel.MainViewModel
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.Glide
+import androidx.viewpager.widget.ViewPager
+import kotlinx.android.synthetic.main.detail_image_view.*
 import kotlinx.android.synthetic.main.detail_image_view.view.*
-import org.androidtown.imagesearch.CallOnClickImage
-import org.androidtown.imagesearch.R
-import org.androidtown.imagesearch.databinding.DetailImageViewBinding
+import org.androidtown.imagesearch.*
 import org.androidtown.imagesearch.model.Document
+import org.androidtown.imagesearch.model.SortEnum
 
-class MainActivity : AppCompatActivity(), CallOnClickImage {
-
+class MainActivity : AppCompatActivity(), CallEvent {
 
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel = MainViewModel()
 
     //전체 이미지리스트
-    private lateinit var documentList: ArrayList<Document>
+    private var documentList = ArrayList<Document>()
 
     //현재/첫번째/마지막 이미지의 포지션
     private var currentPosition: Int = 0
@@ -41,8 +37,11 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
     //팝업 생성 여부
     private var isPopUp = false
 
-    //정렬 방식
-    private var sort = "accuracy"
+    //viewModel.getImageSearch 에 넘겨줄 parameter
+    private var searchWord = ""
+    private var page = 1
+    private var size = 80
+    private var sort = SortEnum.Accuracy
 
     //상세보기 뷰
     private val detailView by lazy {
@@ -52,6 +51,9 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
 
     //리사이클러뷰 어댑터
     private val imageRecyclerViewAdapter by lazy { ImageRecyclerViewAdapter(this) }
+
+    //뷰페이저 어댑터
+    private val imageViewPagerAdapter by lazy { ImageViewPagerAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +67,13 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
      */
     private fun initView() {
 
+        //툴바
         setSupportActionBar(binding.mainToolbar)
+
+        //정확도, 최신 버튼 초기화
+        binding.sortAccuracyTextBtn.isSelected = true
+        binding.sortAccuracyTextBtn.isClickable = false
+        binding.sortRecencyTextBtn.isSelected = false
 
         //그리드 레이아웃 매니저
         val gridLayoutManager = GridLayoutManager(this, 6)
@@ -77,6 +85,27 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
             setHasFixedSize(true)
         }
 
+        //뷰페이저 초기화
+        detailView.vp_image.run {
+            adapter = imageViewPagerAdapter
+            addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrollStateChanged(state: Int) {}
+
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+
+                /**
+                 * 페이지가 변경되고 확정이 될때 이벤트 발생
+                 * 현재 위치 값을 바꾸고, 이미지 이동버튼 속성을 변경한다.
+                 *
+                 * @param position 현재 선태된 페이지 위치
+                 */
+                override fun onPageSelected(position: Int) {
+                    currentPosition = position
+                    onClickLeftRightBtn()
+                }
+            })
+        }
+
         // 포지션 별로 다른 SpanSize 를 차지하도록 아이템 뷰 배치
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -84,10 +113,21 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
             }
         }
 
-        //뷰모델의 documentLiveData 가 바뀌면, 리사이클러뷰 어댑터에 넘겨줌
+        /**
+         * 뷰모델의 documentLiveData 가 바뀌면, 리사이클러뷰 어댑터에 넘겨줌
+         */
         viewModel.documentLiveData.observe(this, Observer { documents ->
-            imageRecyclerViewAdapter.setItems(documents)
-            this.documentList = documents
+            documentList = documents
+            imageRecyclerViewAdapter.setItems(documentList)
+        })
+
+        /**
+         * 뷰모델의 nextDocumentLiveData 바뀌면,
+         * 리사이클러뷰 어댑터에 다음 페이지의 이미지 리스트가 추가된 리스트 넘겨줌
+         * * */
+        viewModel.nextDocumentLiveData.observe(this,Observer{nextDocuments ->
+            documentList.addAll(nextDocuments)
+            imageRecyclerViewAdapter.setItems(documentList)
         })
 
         //검색 버튼 클릭 -> 뷰모델에 검색결과 요청
@@ -100,23 +140,45 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
             removeDetailView()
         }
 
-        //상세보기 뷰에서 해당 이미지 클릭 -> 해당 이미지의 doc_url 로 연결
-        detailView.detail_image_view.setOnClickListener {
-            ContextCompat.startActivity(this, Intent(Intent.ACTION_VIEW, Uri.parse(documentList[currentPosition].doc_url)), null)
-        }
-
         //상세보기 뷰에서 왼쪽 화살표 클릭 -> 이전 이미지를 띄움
         detailView.arrow_left_button.setOnClickListener {
             currentPosition -= 1
-            onClickLeftRightBtn()
+            vp_image.currentItem = currentPosition
         }
 
         //상세보기 뷰에서 오른쪽 화살표 클릭 -> 다음 이미지를 띄움
         detailView.arrow_right_button.setOnClickListener {
             currentPosition += 1
-            onClickLeftRightBtn()
+            vp_image.currentItem = currentPosition
+        }
+
+        //최신 클릭 시
+        binding.sortRecencyTextBtn.setOnClickListener {
+            onClickSortRecencyBtn()
+        }
+
+        //정확도 클릭 시
+        binding.sortAccuracyTextBtn.setOnClickListener {
+            onClickSortAccuracyBtn()
+        }
+
+        //스크롤 최상단 바로가기 버튼 클릭 시
+        binding.topButton.setOnClickListener{
+            //스크롤 최상단으로 올리기
+            binding.imageRecyclerview.layoutManager!!.scrollToPosition(0)
+        }
+
+        //디바이스 키보드 엔터시 검색
+        binding.searchEdittxt.setOnEditorActionListener { _, actionId, _ ->
+            var handled = false
+            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                onClickSearchBtn()
+                handled = true
+            }
+            handled
         }
     }
+
 
     /**
      * 검색 버튼 클릭 시, 뷰모델에 이미지 검색 명령
@@ -124,10 +186,13 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
     private fun onClickSearchBtn() {
 
         //키보드 내리기
-        closeKeyboard()
+        onCloseKeyboard()
 
         //스크롤 최상단으로 올리기
         binding.imageRecyclerview.layoutManager!!.scrollToPosition(0)
+
+        //스크롤 최상단 바로가기 버튼 활성화
+        binding.topButton.visibility = View.VISIBLE
 
         //상세보기 뷰가 떠있는 경우, 상세보기 뷰 제거
         if (isPopUp) {
@@ -136,9 +201,21 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
 
         //뷰모델에 이미지 검색 명령
         if (binding.searchEdittxt.text.toString() != "") {
-            viewModel.getImageSearch(binding.searchEdittxt.text.toString(), sort)
+            searchWord = binding.searchEdittxt.text.toString()
+            viewModel.getImageSearch(searchWord, sort, 1, size)
         } else {
             Toast.makeText(this, "검색어를 입력해주세요", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * 다음 페이지의 이미지 데이터 추가를 viewModel 에 명령
+     */
+    override fun onFinishScroll(position: Int) {
+
+        // meta 의 is_end 가 false 이고, 최대 page(50) 미만인 경우, 다음 페이지의 이미지 데이터 추가를 viewModel 에 명령
+        if(!viewModel.metaData.is_end && page < 50) {
+            viewModel.getImageSearch(searchWord, sort, page++, size)
         }
     }
 
@@ -153,7 +230,9 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
 
         //상세보기 뷰를 띄우고, 해당 이미지를 load
         addDetailView()
-        Glide.with(this).load(documentList[position].image_url).into(detailView.detail_image_view)
+
+        imageViewPagerAdapter.setItems(documentList)
+        detailView.vp_image.currentItem = currentPosition
     }
 
     /**
@@ -162,6 +241,7 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
     private fun addDetailView() {
         isPopUp = true
         binding.imageRecyclerview.visibility = View.GONE
+        binding.topButton.visibility = View.GONE
         binding.detailImageContainer.run {
             visibility = View.VISIBLE
             addView(detailView)
@@ -176,10 +256,42 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
         isPopUp = false
         binding.detailImageContainer.removeAllViews()
         binding.imageRecyclerview.visibility = View.VISIBLE
+        binding.topButton.visibility = View.VISIBLE
     }
 
     /**
-     * [다음/이전 이미지]를 Glide를 사용해 load
+     * 정확도 버튼 클릭시, 정확도 순으로 검색 수행
+     */
+    private fun onClickSortAccuracyBtn() {
+        binding.sortAccuracyImageBtn.visibility = View.VISIBLE
+        binding.sortAccuracyTextBtn.isSelected = true
+        binding.sortAccuracyTextBtn.isClickable = false
+
+        binding.sortRecencyImageBtn.visibility = View.INVISIBLE
+        binding.sortRecencyTextBtn.isSelected = false
+        binding.sortRecencyTextBtn.isClickable = true
+
+        sort = SortEnum.Accuracy
+        onClickSearchBtn()
+    }
+
+    /**
+     * 최신 버튼 클릭시, 최신 순으로 검생 수행
+     */
+    private fun onClickSortRecencyBtn() {
+        binding.sortAccuracyImageBtn.visibility = View.INVISIBLE
+        binding.sortAccuracyTextBtn.isSelected = false
+        binding.sortAccuracyTextBtn.isClickable = true
+
+        binding.sortRecencyImageBtn.visibility = View.VISIBLE
+        binding.sortRecencyTextBtn.isSelected = true
+        binding.sortRecencyTextBtn.isClickable = false
+
+        sort = SortEnum.Recency
+        onClickSearchBtn()
+    }
+
+    /**
      * 현재 포지션에 따라 오른쪽/왼쪽 화살표 버튼의 visibility 변경
      */
     private fun onClickLeftRightBtn() {
@@ -199,7 +311,6 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
                 detailView.arrow_right_button.visibility = View.VISIBLE
             }
         }
-        Glide.with(this).load(documentList[currentPosition].image_url).into(detailView.detail_image_view)
     }
 
     /**
@@ -216,7 +327,7 @@ class MainActivity : AppCompatActivity(), CallOnClickImage {
     /**
      * 키보드 내리기
      */
-    private fun closeKeyboard() {
+    private fun onCloseKeyboard() {
         this.currentFocus?.let { view ->
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)

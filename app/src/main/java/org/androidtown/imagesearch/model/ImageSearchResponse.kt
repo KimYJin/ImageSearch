@@ -1,6 +1,5 @@
 package org.androidtown.imagesearch.model
 
-
 import java.io.Serializable
 
 data class ImageSearchResponse(
