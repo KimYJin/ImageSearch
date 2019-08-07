@@ -10,7 +10,7 @@
 </div>
 
 ### 설명
- (1) MVVM 패턴, RxJava + Retrofit를 이용한 네트워킹 및 옵저빙
+ (1) MVVM 패턴, RxJava + Retrofit를 이용한 네트워킹 및 옵저빙\n
  (2) Live Data를 이용한 Data Binding
  (3) RecyclerView, GridLayoutManager, Glide 를 이용해 검색 결과 화면 구현
  (4) 정확도 순, 최신 순 으로 검색이 가능하도록 구현
