@@ -35,14 +35,14 @@ class MainViewModel : ViewModel() {
      * 모델에 요청해서 이미지 검색결과 데이터를 받아, LiveData 갱신
      */
     fun getImageSearch(query: String, sort: SortEnum, page: Int, size: Int) {
-        addDisposable(model.getData(query, sort, page, size)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                it.run {
-                    metaData = meta     //해당 메소드 호출 전에 meta.is_end 검사를 위해 값 넣어줌.
-
-                    if (documents.size > 0) {
+        addDisposable(
+            model.getData(query, sort, page, size)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it.run {
+                        metaData = meta     //해당 메소드 호출 전에 meta.is_end 검사를 위해 값 넣어줌.
+                        Log.d("MainViewModel", "meta : $meta")
                         Log.d("MainViewModel", "documents : $documents")
 
                         if (page > 1) {  // 다음 페이지의 데이터를 가져온 경우, nextDocumentLiveData 를 갱신
@@ -51,11 +51,9 @@ class MainViewModel : ViewModel() {
                             documentLiveData.postValue(documents)
                         }
                     }
-                    Log.d("MainViewModel", "meta : $meta")
-                }
-            }, {
-                Log.d("MainViewModel", "response error, message : ${it.message}")
-            })
+                }, {
+                    Log.d("MainViewModel", "response error, message : ${it.message}")
+                })
         )
     }
 
@@ -67,5 +65,5 @@ class MainViewModel : ViewModel() {
         compositeDisposable.clear()
         super.onCleared()
     }
-
 }
+

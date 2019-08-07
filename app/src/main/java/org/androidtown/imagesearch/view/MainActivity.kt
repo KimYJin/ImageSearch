@@ -14,8 +14,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager.widget.ViewPager
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.detail_image_view.*
 import kotlinx.android.synthetic.main.detail_image_view.view.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 import org.androidtown.imagesearch.*
 import org.androidtown.imagesearch.model.Document
 import org.androidtown.imagesearch.model.SortEnum
@@ -68,7 +70,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
     private fun initView() {
 
         //툴바
-        setSupportActionBar(binding.mainToolbar)
+        setSupportActionBar(main_toolbar.toolbar)
 
         //정확도, 최신 버튼 초기화
         binding.sortAccuracyTextBtn.isSelected = true
@@ -117,15 +119,18 @@ class MainActivity : AppCompatActivity(), CallEvent {
          * 뷰모델의 documentLiveData 가 바뀌면, 리사이클러뷰 어댑터에 넘겨줌
          */
         viewModel.documentLiveData.observe(this, Observer { documents ->
-            documentList = documents
-            imageRecyclerViewAdapter.setItems(documentList)
+            if (documents.size == 0) {
+                Toast.makeText(this, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
+            }
+                documentList = documents
+                imageRecyclerViewAdapter.setItems(documentList)
         })
 
         /**
          * 뷰모델의 nextDocumentLiveData 바뀌면,
          * 리사이클러뷰 어댑터에 다음 페이지의 이미지 리스트가 추가된 리스트 넘겨줌
          * * */
-        viewModel.nextDocumentLiveData.observe(this,Observer{nextDocuments ->
+        viewModel.nextDocumentLiveData.observe(this, Observer { nextDocuments ->
             documentList.addAll(nextDocuments)
             imageRecyclerViewAdapter.setItems(documentList)
         })
@@ -163,7 +168,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
         }
 
         //스크롤 최상단 바로가기 버튼 클릭 시
-        binding.topButton.setOnClickListener{
+        binding.topButton.setOnClickListener {
             //스크롤 최상단으로 올리기
             binding.imageRecyclerview.layoutManager!!.scrollToPosition(0)
         }
@@ -171,7 +176,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
         //디바이스 키보드 엔터시 검색
         binding.searchEdittxt.setOnEditorActionListener { _, actionId, _ ->
             var handled = false
-            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 onClickSearchBtn()
                 handled = true
             }
@@ -191,19 +196,22 @@ class MainActivity : AppCompatActivity(), CallEvent {
         //스크롤 최상단으로 올리기
         binding.imageRecyclerview.layoutManager!!.scrollToPosition(0)
 
-        //스크롤 최상단 바로가기 버튼 활성화
-        binding.topButton.visibility = View.VISIBLE
-
         //상세보기 뷰가 떠있는 경우, 상세보기 뷰 제거
         if (isPopUp) {
             removeDetailView()
         }
 
-        //뷰모델에 이미지 검색 명령
+        //검색창에 검색어가 있으면,
         if (binding.searchEdittxt.text.toString() != "") {
+
+            //뷰모델에 이미지 검색 명령
             searchWord = binding.searchEdittxt.text.toString()
             viewModel.getImageSearch(searchWord, sort, 1, size)
-        } else {
+
+            //스크롤 최상단 바로가기 버튼 활성화
+            binding.topButton.visibility = View.VISIBLE
+
+        } else {    //검색창에 검색어가 없으면 검색어를 입력하라는 토스트 메세지 띄우기
             Toast.makeText(this, "검색어를 입력해주세요", Toast.LENGTH_SHORT).show()
         }
     }
@@ -214,13 +222,14 @@ class MainActivity : AppCompatActivity(), CallEvent {
     override fun onFinishScroll(position: Int) {
 
         // meta 의 is_end 가 false 이고, 최대 page(50) 미만인 경우, 다음 페이지의 이미지 데이터 추가를 viewModel 에 명령
-        if(!viewModel.metaData.is_end && page < 50) {
+        if (!viewModel.metaData.is_end && page < 50) {
             viewModel.getImageSearch(searchWord, sort, page++, size)
         }
     }
 
     /**
      * 특정 이미지 클릭 시, 상세보기 뷰에 해당 이미지를 load
+     *
      * @param position ImageViewHolder
      */
     override fun onClickImage(position: Int) {
