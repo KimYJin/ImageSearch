@@ -29,16 +29,16 @@
 
   |  Name  |  Version  |
 	---|---
-    Android Gradle Plugin  |  3.4.2  
-    Gradle  |  5.11  
-	  kotlin  |  1.3.41  
+Android Gradle Plugin  |  3.4.2
+    Gradle  |  5.11
+    kotlin  |  1.3.41
     Compile Sdk | 28 
 
 - 사용 라이브러리
 
 	|Library|Version|
 	---|---
-	rxjava | 2.2.10
+rxjava | 2.2.10
 Retrofit | 2.6.0
-	glide | 4.9.0
+glide | 4.9.0
 
