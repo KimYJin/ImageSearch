@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import org.androidtown.imagesearch.databinding.ActivityMainBinding
 import org.androidtown.imagesearch.viewmodel.MainViewModel
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
     //viewModel.getImageSearch 에 넘겨줄 parameter
     private var searchWord = ""
     private var page = 1
-    private var size = 10
+    private var size = 20
     private var sort = SortEnum.Accuracy
 
     //상세보기 뷰
@@ -123,6 +124,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
                 Toast.makeText(this, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
             }
                 documentList = documents
+
                 imageRecyclerViewAdapter.setItems(documentList)
         })
 
@@ -206,7 +208,8 @@ class MainActivity : AppCompatActivity(), CallEvent {
 
             //뷰모델에 이미지 검색 명령
             searchWord = binding.searchEdittxt.text.toString()
-            viewModel.getImageSearch(searchWord, sort, page, size)
+            viewModel.getImageSearch(searchWord, sort, 1, size) //결과 페이지 번호 page=1
+            Log.d("MainActivity", "searchWord: $searchWord")
 
             //스크롤 최상단 바로가기 버튼 활성화
             binding.topButton.visibility = View.VISIBLE
