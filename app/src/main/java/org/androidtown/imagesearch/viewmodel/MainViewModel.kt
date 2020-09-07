@@ -21,6 +21,7 @@ class MainViewModel : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
+    //Builder Pattern 사용
     private val service: APIService = Retrofit.Builder()
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())

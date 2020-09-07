@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
     //viewModel.getImageSearch 에 넘겨줄 parameter
     private var searchWord = ""
     private var page = 1
-    private var size = 80
+    private var size = 10
     private var sort = SortEnum.Accuracy
 
     //상세보기 뷰
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
 
             //뷰모델에 이미지 검색 명령
             searchWord = binding.searchEdittxt.text.toString()
-            viewModel.getImageSearch(searchWord, sort, 1, size)
+            viewModel.getImageSearch(searchWord, sort, page, size)
 
             //스크롤 최상단 바로가기 버튼 활성화
             binding.topButton.visibility = View.VISIBLE

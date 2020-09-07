@@ -9,13 +9,13 @@ data class ImageSearchResponse(
 
 data class Document(
     var collection: String,
-    var datetime: String,
+    var thumbnail_url: String,
+    var image_url: String,
+    var width: Int,
+    var height: Int,
     var display_sitename: String,
     var doc_url: String,
-    var height: Int,
-    var image_url: String,
-    var thumbnail_url: String,
-    var width: Int
+    var datetime: String
 ) : Serializable
 
 data class Meta(
