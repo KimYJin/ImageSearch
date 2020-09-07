@@ -20,7 +20,7 @@ class ImageViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         }
 
         itemView.run {
-            //뷰홀더 아이템 뷰에 이미지 load95yj
+            //뷰홀더 아이템 뷰에 이미지 load
             Glide.with(context).load(documentList[position].thumbnail_url).into(item_main_image_view)
 
             //해당 아이템뷰 클릭 시, onClickImage 에 position 넘겨줌 (상세보기 뷰 구현을 위해)
