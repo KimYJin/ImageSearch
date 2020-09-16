@@ -16,6 +16,8 @@ class MainViewModel : ViewModel() {
 
     val documentLiveData = MutableLiveData<ArrayList<Document>>()
     val nextDocumentLiveData = MutableLiveData<ArrayList<Document>>()
+    val loadingLiveData = MutableLiveData<Boolean>()
+
 
     lateinit var metaData: Meta
 
@@ -36,6 +38,9 @@ class MainViewModel : ViewModel() {
      * 모델에 요청해서 이미지 검색결과 데이터를 받아, LiveData 갱신
      */
     fun getImageSearch(query: String, sort: SortEnum, page: Int, size: Int) {
+
+        loadingLiveData.postValue(true)
+
         addDisposable(
             model.getData(query, sort, page, size)
                 .subscribeOn(Schedulers.io())
@@ -51,9 +56,12 @@ class MainViewModel : ViewModel() {
                         } else {    //첫 번째 검색 결과 페이지인 경우, documentLiveData 를 갱신
                             documentLiveData.postValue(documents)
                         }
+                        loadingLiveData.postValue(false)
                     }
                 }, {
                     Log.d("MainViewModel", "response error, message : ${it.message}")
+                    loadingLiveData.postValue(false)
+
                 })
         )
     }

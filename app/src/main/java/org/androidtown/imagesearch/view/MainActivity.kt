@@ -1,5 +1,6 @@
 package org.androidtown.imagesearch.view
 
+import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
@@ -7,6 +8,7 @@ import androidx.lifecycle.Observer
 import org.androidtown.imagesearch.databinding.ActivityMainBinding
 import org.androidtown.imagesearch.viewmodel.MainViewModel
 import android.content.Context
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +33,8 @@ class MainActivity : AppCompatActivity(), CallEvent {
 
     //전체 이미지리스트
     private var documentList = ArrayList<Document>()
+
+    var pro:ProgressDialog? = null
 
     //현재/첫번째/마지막 이미지의 포지션
     private var currentPosition: Int = 0
@@ -115,6 +119,18 @@ class MainActivity : AppCompatActivity(), CallEvent {
                 return if (position % 5 < 2) 3 else 2
             }
         }
+
+
+        viewModel.loadingLiveData.observe(this, Observer { loading->
+            if(loading){
+                pro = ProgressDialog.show(this,"이미지 검색","로딩 중")
+
+            }else{
+                var handler = Handler()
+                var thread = Runnable { pro?.cancel() }
+                handler.postDelayed(thread,3000)
+            }
+        })
 
         /**
          * 뷰모델의 documentLiveData 가 바뀌면, 리사이클러뷰 어댑터에 넘겨줌
