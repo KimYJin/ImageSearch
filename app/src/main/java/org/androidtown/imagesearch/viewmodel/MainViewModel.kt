@@ -58,9 +58,8 @@ class MainViewModel : ViewModel() {
             model.getData(query, sort, page, size)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doFinally { subject.onNext(false)}
                 .subscribe({
-
-                    subject.onNext(false)
 
                     it.run {
                         metaData = meta     //해당 메소드 호출 전에 meta.is_end 검사를 위해 값 넣어줌.
