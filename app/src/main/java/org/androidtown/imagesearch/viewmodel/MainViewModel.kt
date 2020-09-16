@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import io.reactivex.Maybe.just
 import io.reactivex.Observable
+import io.reactivex.Observable.interval
 import io.reactivex.Observable.just
 import io.reactivex.Single.just
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -21,6 +22,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class MainViewModel : ViewModel() {
@@ -58,7 +60,11 @@ class MainViewModel : ViewModel() {
             model.getData(query, sort, page, size)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doFinally { subject.onNext(false)}
+                //.repeatWhen { it->it.delay(1, TimeUnit.SECONDS) }
+                .doFinally {
+                    Observable.timer(5, TimeUnit.SECONDS)
+                        .subscribe { subject.onNext(false)  }
+                }
                 .subscribe({
 
                     it.run {

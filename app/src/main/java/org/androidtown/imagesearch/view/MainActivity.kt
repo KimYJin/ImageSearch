@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.toolbar.view.*
 import org.androidtown.imagesearch.*
 import org.androidtown.imagesearch.model.Document
 import org.androidtown.imagesearch.model.SortEnum
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), CallEvent {
 
@@ -137,11 +138,14 @@ class MainActivity : AppCompatActivity(), CallEvent {
                     pro = ProgressDialog.show(this, "이미지 검색", "로딩 중")
 
                 } else {
-                    val handler = Handler()
-                    val thread = Runnable { pro?.cancel() }
-                    handler.postDelayed(thread, 3000)
+                    pro?.cancel()
+                    //val handler = Handler()
+                    //val thread = Runnable { pro?.cancel() }
+                    //handler.postDelayed(thread, 3000)
                 }
             }
+
+
         )
 
 
