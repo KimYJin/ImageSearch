@@ -60,10 +60,9 @@ class MainViewModel : ViewModel() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
 
+                    subject.onNext(false)
+
                     it.run {
-
-                        subject.onNext(false)
-
                         metaData = meta     //해당 메소드 호출 전에 meta.is_end 검사를 위해 값 넣어줌.
                         Log.d("MainViewModel", "meta : $meta")
                         Log.d("MainViewModel", "documents : $documents")
@@ -76,9 +75,8 @@ class MainViewModel : ViewModel() {
                     }
                 }, {
                     Log.d("MainViewModel", "response error, message : ${it.message}")
-
-                    subject.onNext(false)
                 })
+
         )
     }
 
