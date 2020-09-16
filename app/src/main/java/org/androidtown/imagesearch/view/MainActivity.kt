@@ -1,5 +1,6 @@
 package org.androidtown.imagesearch.view
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,6 +18,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager.widget.ViewPager
+import io.reactivex.Observable
+import io.reactivex.observers.DisposableObserver
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.detail_image_view.*
 import kotlinx.android.synthetic.main.detail_image_view.view.*
@@ -47,7 +50,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
     //viewModel.getImageSearch 에 넘겨줄 parameter
     private var searchWord = ""
     private var page = 1
-    private var size = 20
+    private var size = 50
     private var sort = SortEnum.Accuracy
 
     //상세보기 뷰
@@ -72,6 +75,7 @@ class MainActivity : AppCompatActivity(), CallEvent {
     /**
      * 뷰 초기화
      */
+    @SuppressLint("CheckResult")
     private fun initView() {
 
         //툴바
@@ -120,17 +124,16 @@ class MainActivity : AppCompatActivity(), CallEvent {
             }
         }
 
-
-        viewModel.loadingLiveData.observe(this, Observer { loading->
+        viewModel.subject.subscribe{ loading->
             if(loading){
                 pro = ProgressDialog.show(this,"이미지 검색","로딩 중")
 
             }else{
-                var handler = Handler()
-                var thread = Runnable { pro?.cancel() }
+                val handler = Handler()
+                val thread = Runnable { pro?.cancel() }
                 handler.postDelayed(thread,3000)
             }
-        })
+        }
 
         /**
          * 뷰모델의 documentLiveData 가 바뀌면, 리사이클러뷰 어댑터에 넘겨줌

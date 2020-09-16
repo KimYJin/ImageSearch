@@ -1,16 +1,27 @@
 package org.androidtown.imagesearch.viewmodel
 
+import android.app.ProgressDialog
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import io.reactivex.Maybe.just
+import io.reactivex.Observable
+import io.reactivex.Observable.just
+import io.reactivex.Single.just
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import org.androidtown.imagesearch.model.*
+import org.androidtown.imagesearch.view.MainActivity
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainViewModel : ViewModel() {
 
@@ -18,6 +29,7 @@ class MainViewModel : ViewModel() {
     val nextDocumentLiveData = MutableLiveData<ArrayList<Document>>()
     val loadingLiveData = MutableLiveData<Boolean>()
 
+    val subject = PublishSubject.create<Boolean>()
 
     lateinit var metaData: Meta
 
@@ -39,14 +51,18 @@ class MainViewModel : ViewModel() {
      */
     fun getImageSearch(query: String, sort: SortEnum, page: Int, size: Int) {
 
-        loadingLiveData.postValue(true)
+        subject.onNext(true)
 
         addDisposable(
             model.getData(query, sort, page, size)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+
                     it.run {
+
+                        subject.onNext(false)
+
                         metaData = meta     //해당 메소드 호출 전에 meta.is_end 검사를 위해 값 넣어줌.
                         Log.d("MainViewModel", "meta : $meta")
                         Log.d("MainViewModel", "documents : $documents")
@@ -56,12 +72,11 @@ class MainViewModel : ViewModel() {
                         } else {    //첫 번째 검색 결과 페이지인 경우, documentLiveData 를 갱신
                             documentLiveData.postValue(documents)
                         }
-                        loadingLiveData.postValue(false)
                     }
                 }, {
                     Log.d("MainViewModel", "response error, message : ${it.message}")
-                    loadingLiveData.postValue(false)
 
+                    subject.onNext(false)
                 })
         )
     }
