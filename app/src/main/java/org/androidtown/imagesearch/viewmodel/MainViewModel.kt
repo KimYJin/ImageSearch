@@ -54,6 +54,7 @@ class MainViewModel : ViewModel() {
         subject.onNext(true)
 
         addDisposable(
+
             model.getData(query, sort, page, size)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

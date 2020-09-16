@@ -18,8 +18,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager.widget.ViewPager
-import io.reactivex.Observable
-import io.reactivex.observers.DisposableObserver
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.detail_image_view.*
 import kotlinx.android.synthetic.main.detail_image_view.view.*
@@ -37,7 +37,9 @@ class MainActivity : AppCompatActivity(), CallEvent {
     //전체 이미지리스트
     private var documentList = ArrayList<Document>()
 
-    var pro:ProgressDialog? = null
+    var pro: ProgressDialog? = null
+
+    private val compositeDisposable = CompositeDisposable()
 
     //현재/첫번째/마지막 이미지의 포지션
     private var currentPosition: Int = 0
@@ -102,7 +104,12 @@ class MainActivity : AppCompatActivity(), CallEvent {
             addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
                 override fun onPageScrollStateChanged(state: Int) {}
 
-                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                }
 
                 /**
                  * 페이지가 변경되고 확정이 될때 이벤트 발생
@@ -124,16 +131,20 @@ class MainActivity : AppCompatActivity(), CallEvent {
             }
         }
 
-        viewModel.subject.subscribe{ loading->
-            if(loading){
-                pro = ProgressDialog.show(this,"이미지 검색","로딩 중")
+        addDisposable(
+            viewModel.subject.subscribe { loading ->
+                if (loading) {
+                    pro = ProgressDialog.show(this, "이미지 검색", "로딩 중")
 
-            }else{
-                val handler = Handler()
-                val thread = Runnable { pro?.cancel() }
-                handler.postDelayed(thread,3000)
+                } else {
+                    val handler = Handler()
+                    val thread = Runnable { pro?.cancel() }
+                    handler.postDelayed(thread, 3000)
+                }
             }
-        }
+        )
+
+
 
         /**
          * 뷰모델의 documentLiveData 가 바뀌면, 리사이클러뷰 어댑터에 넘겨줌
@@ -142,9 +153,9 @@ class MainActivity : AppCompatActivity(), CallEvent {
             if (documents.size == 0) {
                 Toast.makeText(this, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
             }
-                documentList = documents
+            documentList = documents
 
-                imageRecyclerViewAdapter.setItems(documentList)
+            imageRecyclerViewAdapter.setItems(documentList)
         })
 
         /**
@@ -203,6 +214,16 @@ class MainActivity : AppCompatActivity(), CallEvent {
             }
             handled
         }
+    }
+
+
+    private fun addDisposable(disposable: Disposable) {
+        compositeDisposable.add(disposable)
+    }
+
+    override fun onDestroy() {
+        compositeDisposable.clear()
+        super.onDestroy()
     }
 
 
@@ -360,8 +381,11 @@ class MainActivity : AppCompatActivity(), CallEvent {
      */
     private fun onCloseKeyboard() {
         this.currentFocus?.let { view ->
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val inputMethodManager =
+                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
+
+
 }
